@@ -129,6 +129,15 @@ void EnvironmentOptions::CheckOptions(std::vector<std::string>* errors) {
                       "used, not both");
   }
 
+  if (real_time) {
+    struct sched_param param;
+    memset(&param, 0, sizeof(param));
+    param.sched_priority = sched_get_priority_max(SCHED_FIFO);
+    if (sched_setscheduler(/*current process*/0, SCHED_FIFO, &param) != 0) {
+      errors->push_back("--real-time not applied");
+    }
+  }
+
 #if HAVE_INSPECTOR
   if (!cpu_prof) {
     if (!cpu_prof_name.empty()) {
@@ -270,6 +279,10 @@ DebugOptionsParser::DebugOptionsParser() {
 }
 
 EnvironmentOptionsParser::EnvironmentOptionsParser() {
+  AddOption("--real-time",
+            "experimental real-time support",
+            &EnvironmentOptions::real_time,
+            kAllowedInEnvironment);
   AddOption("--enable-source-maps",
             "experimental Source Map V3 support",
             &EnvironmentOptions::enable_source_maps,

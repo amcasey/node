@@ -99,6 +99,7 @@ class DebugOptions : public Options {
 
 class EnvironmentOptions : public Options {
  public:
+  bool real_time = false;
   bool abort_on_uncaught_exception = false;
   bool enable_source_maps = false;
   bool experimental_json_modules = false;
